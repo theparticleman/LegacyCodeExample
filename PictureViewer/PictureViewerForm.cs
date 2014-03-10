@@ -13,7 +13,7 @@ namespace PictureViewer
         public PictureViewerForm()
         {
             InitializeComponent();
-            presenter = new PictureViewerPresenter(this);
+            presenter = new PictureViewerPresenter(this, new FileDependencies());
         }
 
         private void PictureViewerForm_Load(object sender, EventArgs e)

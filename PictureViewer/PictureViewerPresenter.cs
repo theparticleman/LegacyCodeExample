@@ -10,19 +10,24 @@ namespace PictureViewer
     public class PictureViewerPresenter
     {
         private readonly IPictureViewerForm form;
+        private readonly IFileDependencies fileDependencies;
 
-        public PictureViewerPresenter(IPictureViewerForm form)
+        public PictureViewerPresenter(IPictureViewerForm form, IFileDependencies fileDependencies)
         {
             this.form = form;
+            this.fileDependencies = fileDependencies;
         }
 
         public void SelectedImageChanged()
         {
-            //pictureBox.ImageLocation =
-            //Directory.GetFiles(directoryTextBox.Text, "*.jpg").Single(x => x.EndsWith((string)imageListBox.SelectedItem));
-            form.CurrentImageLocation =
-            Directory.GetFiles(form.ImagesLocation, "*.jpg").Single(x => x.EndsWith(form.SelectedImage));
+            form.CurrentImageLocation = fileDependencies.GetFilesInDirectory(form.ImagesLocation, "*.jpg")
+                .Single(x => x.EndsWith(form.SelectedImage));
         }
+    }
+
+    public interface IFileDependencies
+    {
+        IEnumerable<string> GetFilesInDirectory(string location, string searchPattern);
     }
 
     public interface IPictureViewerForm

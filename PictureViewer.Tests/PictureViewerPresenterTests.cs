@@ -10,17 +10,25 @@ namespace PictureViewer.Tests
     [TestFixture]
     public class PictureViewerPresenterTests
     {
+        private FileDependenciesStub fileDependencies;
+
         [Test]
-        public void SelectedImageChangedShouldDoSomething()
+        public void SelectedImageChangedShouldSetCurrentImageLocationToFullFilePath()
         {
+            fileDependencies = new FileDependenciesStub
+            {
+                ResultsForGetFilesFromDirectoryEnumerable = new List<string> { @"C:\file1.jpg", @"C:\file2.jpg" }
+            };
             var formStub = new PictureViewerStub
             {
-                ImagesLocation = @"C:\Users\jonathan-turner\Pictures\Wallpapers", //This has to be a real directory on disk.
-                SelectedImage = @"137801.jpg" //This has to be the name of a real file in that directory.
+                ImagesLocation = @"C:\any made up directory", 
+                SelectedImage = @"file1.jpg"
             };
-            var presenter = new PictureViewerPresenter(formStub);
+            var presenter = new PictureViewerPresenter(formStub, fileDependencies);
 
             presenter.SelectedImageChanged();
+
+            Assert.That(formStub.CurrentImageLocation, Is.EqualTo(@"C:\file1.jpg"));
         }
     }
 
@@ -29,5 +37,14 @@ namespace PictureViewer.Tests
         public string CurrentImageLocation { get; set; }
         public string ImagesLocation { get; set; }
         public string SelectedImage { get; set; }
+    }
+
+    class FileDependenciesStub : IFileDependencies
+    {
+        public IEnumerable<string> ResultsForGetFilesFromDirectoryEnumerable { get; set; }
+        public IEnumerable<string> GetFilesInDirectory(string location, string searchPattern)
+        {
+            return ResultsForGetFilesFromDirectoryEnumerable;
+        }
     }
 }
