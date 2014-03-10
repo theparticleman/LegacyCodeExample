@@ -5,13 +5,15 @@ using System.Windows.Forms;
 
 namespace PictureViewer
 {
-    public partial class PictureViewerForm : Form
+    public partial class PictureViewerForm : Form, IPictureViewerForm
     {
         private string startDirectoryFilePath;
+        private readonly PictureViewerPresenter presenter;
 
         public PictureViewerForm()
         {
             InitializeComponent();
+            presenter = new PictureViewerPresenter(this);
         }
 
         private void PictureViewerForm_Load(object sender, EventArgs e)
@@ -46,8 +48,25 @@ namespace PictureViewer
 
         private void imageListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            pictureBox.ImageLocation =
-                Directory.GetFiles(directoryTextBox.Text, "*.jpg").Single(x => x.EndsWith((string)imageListBox.SelectedItem));
+            presenter.SelectedImageChanged();
+        }
+
+        public string CurrentImageLocation
+        {
+            get { return pictureBox.ImageLocation; }
+            set { pictureBox.ImageLocation = value; }
+        }
+
+        public string ImagesLocation
+        {
+            get { return directoryTextBox.Text; }
+            set { directoryTextBox.Text = value; }
+        }
+
+        public string SelectedImage
+        {
+            get { return (string)imageListBox.SelectedItem; }
+            set { imageListBox.SelectedItem = value; }
         }
     }
 }
