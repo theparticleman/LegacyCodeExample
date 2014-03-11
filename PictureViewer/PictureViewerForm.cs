@@ -27,10 +27,7 @@ namespace PictureViewer
 
         private void browseButton_Click(object sender, EventArgs e)
         {
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
-            {
-                directoryTextBox.Text = folderBrowserDialog.SelectedPath;
-            }
+            presenter.UpdateImagesLocation();
         }
 
         private void directoryTextBox_TextChanged(object sender, EventArgs e)
@@ -67,6 +64,16 @@ namespace PictureViewer
         {
             get { return (string)imageListBox.SelectedItem; }
             set { imageListBox.SelectedItem = value; }
+        }
+
+        public bool ShouldUpdateImagesLocation
+        {
+            get { return folderBrowserDialog.ShowDialog() == DialogResult.OK; }
+        }
+
+        public string NewImagesLocation
+        {
+            get { return folderBrowserDialog.SelectedPath; }
         }
     }
 }

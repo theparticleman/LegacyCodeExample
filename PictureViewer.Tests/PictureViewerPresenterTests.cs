@@ -30,6 +30,24 @@ namespace PictureViewer.Tests
 
             Assert.That(formStub.CurrentImageLocation, Is.EqualTo(@"C:\file1.jpg"));
         }
+
+        [Test]
+        public void UpdateImagesLocationShouldSetImagesLocationToNewImagesLocation()
+        {
+            const string newImagesLocation = @"C:\new images location";
+            fileDependencies = new FileDependenciesStub();
+            var formStub = new PictureViewerStub
+            {
+                ShouldUpdateImagesLocation = true,
+                NewImagesLocation = newImagesLocation
+            };
+            var presenter = new PictureViewerPresenter(formStub, fileDependencies);
+
+            presenter.UpdateImagesLocation();
+
+            Assert.That(formStub.ImagesLocation, Is.EqualTo(newImagesLocation));
+        }
+
     }
 
     class PictureViewerStub : IPictureViewerForm
@@ -37,6 +55,8 @@ namespace PictureViewer.Tests
         public string CurrentImageLocation { get; set; }
         public string ImagesLocation { get; set; }
         public string SelectedImage { get; set; }
+        public bool ShouldUpdateImagesLocation { get; set; }
+        public string NewImagesLocation { get; set; }
     }
 
     class FileDependenciesStub : IFileDependencies

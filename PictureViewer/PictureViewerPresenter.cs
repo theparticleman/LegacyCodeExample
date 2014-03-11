@@ -23,6 +23,14 @@ namespace PictureViewer
             form.CurrentImageLocation = fileDependencies.GetFilesInDirectory(form.ImagesLocation, "*.jpg")
                 .Single(x => x.EndsWith(form.SelectedImage));
         }
+
+        public void UpdateImagesLocation()
+        {
+            if (form.ShouldUpdateImagesLocation)
+            {
+                form.ImagesLocation = form.NewImagesLocation;
+            }
+        }
     }
 
     public interface IFileDependencies
@@ -35,5 +43,7 @@ namespace PictureViewer
         string CurrentImageLocation { get; set; }
         string ImagesLocation { get; set; }
         string SelectedImage { get; set; }
+        bool ShouldUpdateImagesLocation { get; }
+        string NewImagesLocation { get; }
     }
 }
