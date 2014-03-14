@@ -9,6 +9,9 @@ namespace PictureViewer
 {
     public class PictureViewerPresenter
     {
+        //This variable is temporarily public until we can get the final
+        //method in the form under test.
+        public string startDirectoryFilePath;
         private readonly IPictureViewerForm form;
         private readonly IFileDependencies fileDependencies;
 
@@ -31,11 +34,23 @@ namespace PictureViewer
                 form.ImagesLocation = form.NewImagesLocation;
             }
         }
+
+        public void Initialize()
+        {
+            startDirectoryFilePath = Path.Combine(Path.GetDirectoryName(fileDependencies.ExecutablePath), "startpath.txt");
+            if (fileDependencies.FileExists(startDirectoryFilePath))
+            {
+                form.ImagesLocation = fileDependencies.ReadAllFileText(startDirectoryFilePath);
+            }
+        }
     }
 
     public interface IFileDependencies
     {
         IEnumerable<string> GetFilesInDirectory(string location, string searchPattern);
+        string ExecutablePath { get; }
+        bool FileExists(string path);
+        string ReadAllFileText(string filePath);
     }
 
     public interface IPictureViewerForm

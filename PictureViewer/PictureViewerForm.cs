@@ -7,7 +7,6 @@ namespace PictureViewer
 {
     public partial class PictureViewerForm : Form, IPictureViewerForm
     {
-        private string startDirectoryFilePath;
         private readonly PictureViewerPresenter presenter;
 
         public PictureViewerForm()
@@ -18,11 +17,7 @@ namespace PictureViewer
 
         private void PictureViewerForm_Load(object sender, EventArgs e)
         {
-            startDirectoryFilePath = Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "startpath.txt");
-            if (File.Exists(startDirectoryFilePath))
-            {
-                directoryTextBox.Text = File.ReadAllText(startDirectoryFilePath);
-            }
+            presenter.Initialize();
         }
 
         private void browseButton_Click(object sender, EventArgs e)
@@ -39,7 +34,8 @@ namespace PictureViewer
                 {
                     imageListBox.Items.Add(Path.GetFileName(file));
                 }
-                File.WriteAllText(startDirectoryFilePath, directoryTextBox.Text);
+                //Temporary fix
+                File.WriteAllText(presenter.startDirectoryFilePath, directoryTextBox.Text);
             }
         }
 

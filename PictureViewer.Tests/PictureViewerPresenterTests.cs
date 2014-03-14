@@ -10,6 +10,7 @@ namespace PictureViewer.Tests
     [TestFixture]
     public class PictureViewerPresenterTests
     {
+        private const string NewImagesLocation = @"C:\new images location";
         private FileDependenciesStub fileDependencies;
 
         [Test]
@@ -34,18 +35,34 @@ namespace PictureViewer.Tests
         [Test]
         public void UpdateImagesLocationShouldSetImagesLocationToNewImagesLocation()
         {
-            const string newImagesLocation = @"C:\new images location";
             fileDependencies = new FileDependenciesStub();
             var formStub = new PictureViewerStub
             {
                 ShouldUpdateImagesLocation = true,
-                NewImagesLocation = newImagesLocation
+                NewImagesLocation = NewImagesLocation
             };
             var presenter = new PictureViewerPresenter(formStub, fileDependencies);
 
             presenter.UpdateImagesLocation();
 
-            Assert.That(formStub.ImagesLocation, Is.EqualTo(newImagesLocation));
+            Assert.That(formStub.ImagesLocation, Is.EqualTo(NewImagesLocation));
+        }
+
+        [Test]
+        public void InitializeShouldSetImagesLocation()
+        {
+            fileDependencies = new FileDependenciesStub
+            {
+                ExecutablePath = @"C:\executable path\app.exe",
+                ResultForFileExists = true,
+                ResultsForReadAllFileText = NewImagesLocation
+            };
+            var formStub = new PictureViewerStub();
+            var presenter = new PictureViewerPresenter(formStub, fileDependencies);
+
+            presenter.Initialize();
+
+            Assert.That(formStub.ImagesLocation, Is.EqualTo(NewImagesLocation));
         }
 
     }
@@ -61,10 +78,27 @@ namespace PictureViewer.Tests
 
     class FileDependenciesStub : IFileDependencies
     {
+        //Writing everything for the file dependencies stub is starting to get a
+        //little cumbersome. A mocking framework would eliminate the need to
+        //write all this code manually.
         public IEnumerable<string> ResultsForGetFilesFromDirectoryEnumerable { get; set; }
+        public bool ResultForFileExists { get; set; }
         public IEnumerable<string> GetFilesInDirectory(string location, string searchPattern)
         {
             return ResultsForGetFilesFromDirectoryEnumerable;
         }
+
+        public string ExecutablePath { get; set; }
+        public bool FileExists(string path)
+        {
+            return ResultForFileExists;
+        }
+
+        public string ReadAllFileText(string filePath)
+        {
+            return ResultsForReadAllFileText;
+        }
+
+        public string ResultsForReadAllFileText { get; set; }
     }
 }
