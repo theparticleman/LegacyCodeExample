@@ -12,26 +12,27 @@ namespace PictureViewer.Tests
     public class PictureViewerPresenterTests
     {
         private const string NewImagesLocation = @"C:\new images location";
-        private FileDependenciesStub fileDependencies;
+        private Mock<IFileDependencies> fileDependencies;
         private Mock<IPictureViewerForm> formStub;
         private PictureViewerPresenter presenter;
 
         [SetUp]
         public void SetUp()
         {
-            fileDependencies = new FileDependenciesStub();
+            fileDependencies = new Mock<IFileDependencies>();
             formStub = new Mock<IPictureViewerForm>();
-            presenter = new PictureViewerPresenter(formStub.Object, fileDependencies);
+            presenter = new PictureViewerPresenter(formStub.Object, fileDependencies.Object);
         }
 
         [Test]
         public void SelectedImageChangedShouldSetCurrentImageLocationToFullFilePath()
         {
-            fileDependencies.ResultsForGetFilesFromDirectory = new List<string>
-            {
-                @"C:\file1.jpg",
-                @"C:\file2.jpg"
-            };
+            fileDependencies.Setup(x => x.GetFilesInDirectory(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<string>
+                {
+                    @"C:\file1.jpg",
+                    @"C:\file2.jpg"
+                });
             formStub.Setup(x => x.ImagesLocation).Returns(@"C:\any made up directory");
             formStub.Setup(x => x.SelectedImage).Returns(@"file1.jpg");
 
@@ -54,9 +55,9 @@ namespace PictureViewer.Tests
         [Test]
         public void InitializeShouldSetImagesLocation()
         {
-            fileDependencies.ExecutablePath = @"C:\executable path\app.exe";
-            fileDependencies.ResultForFileExists = true;
-            fileDependencies.ResultsForReadAllFileText = NewImagesLocation;
+            fileDependencies.Setup(x => x.ExecutablePath).Returns(@"C:\executable path\app.exe");
+            fileDependencies.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
+            fileDependencies.Setup(x => x.ReadAllFileText(It.IsAny<string>())).Returns(NewImagesLocation);
 
             presenter.Initialize();
 
@@ -66,55 +67,18 @@ namespace PictureViewer.Tests
         [Test]
         public void ImagesLocationChangedShouldAddImagesToList()
         {
-            fileDependencies.ResultsForDirectoryExists = true;
-            fileDependencies.ResultsForGetFilesFromDirectory = new List<string>
-            {
-                @"C:\file1.jpg",
-                @"C:\file2.jpg"
-            };
+            fileDependencies.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
+            fileDependencies.Setup(x => x.GetFilesInDirectory(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<string>
+                {
+                    @"C:\file1.jpg",
+                    @"C:\file2.jpg"
+                });
 
             presenter.ImagesLocationChanged();
 
             formStub.Verify(x => x.AddImageToList("file1.jpg"));
         }
 
-    }
-
-    class FileDependenciesStub : IFileDependencies
-    {
-        //Writing everything for the file dependencies stub is starting to get a
-        //little cumbersome. A mocking framework would eliminate the need to
-        //write all this code manually.
-        public IEnumerable<string> ResultsForGetFilesFromDirectory { get; set; }
-        public bool ResultForFileExists { get; set; }
-        public IEnumerable<string> GetFilesInDirectory(string location, string searchPattern)
-        {
-            return ResultsForGetFilesFromDirectory;
-        }
-
-        public string ExecutablePath { get; set; }
-        public bool FileExists(string path)
-        {
-            return ResultForFileExists;
-        }
-
-        public string ReadAllFileText(string filePath)
-        {
-            return ResultsForReadAllFileText;
-        }
-
-        public bool DirectoryExists(string path)
-        {
-            return ResultsForDirectoryExists;
-        }
-
-        public void WriteAllFileText(string filePath, string text)
-        {
-            //Don't do anything until our tests check for this.
-        }
-
-        public bool ResultsForDirectoryExists { get; set; }
-
-        public string ResultsForReadAllFileText { get; set; }
     }
 }
