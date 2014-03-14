@@ -26,5 +26,15 @@ namespace PictureViewer
         {
             return File.ReadAllText(filePath);
         }
+
+        public bool DirectoryExists(string path)
+        {
+            return Directory.Exists(path);
+        }
+
+        public void WriteAllFileText(string filePath, string text)
+        {
+            File.WriteAllText(filePath, text);
+        }
     }
 }

@@ -9,9 +9,7 @@ namespace PictureViewer
 {
     public class PictureViewerPresenter
     {
-        //This variable is temporarily public until we can get the final
-        //method in the form under test.
-        public string startDirectoryFilePath;
+        private string startDirectoryFilePath;
         private readonly IPictureViewerForm form;
         private readonly IFileDependencies fileDependencies;
 
@@ -43,6 +41,19 @@ namespace PictureViewer
                 form.ImagesLocation = fileDependencies.ReadAllFileText(startDirectoryFilePath);
             }
         }
+
+        public void ImagesLocationChanged()
+        {
+            if (fileDependencies.DirectoryExists(form.ImagesLocation))
+            {
+                form.ClearImagesList();
+                foreach (var file in fileDependencies.GetFilesInDirectory(form.ImagesLocation, "*.jpg"))
+                {
+                    form.AddImageToList(Path.GetFileName(file));
+                }
+                fileDependencies.WriteAllFileText(startDirectoryFilePath, form.ImagesLocation);
+            }
+        }
     }
 
     public interface IFileDependencies
@@ -51,6 +62,8 @@ namespace PictureViewer
         string ExecutablePath { get; }
         bool FileExists(string path);
         string ReadAllFileText(string filePath);
+        bool DirectoryExists(string path);
+        void WriteAllFileText(string filePath, string text);
     }
 
     public interface IPictureViewerForm
@@ -60,5 +73,7 @@ namespace PictureViewer
         string SelectedImage { get; set; }
         bool ShouldUpdateImagesLocation { get; }
         string NewImagesLocation { get; }
+        void ClearImagesList();
+        void AddImageToList(string imageName);
     }
 }

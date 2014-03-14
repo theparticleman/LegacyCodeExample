@@ -27,16 +27,7 @@ namespace PictureViewer
 
         private void directoryTextBox_TextChanged(object sender, EventArgs e)
         {
-            if (Directory.Exists(directoryTextBox.Text))
-            {
-                imageListBox.Items.Clear();
-                foreach (var file in Directory.GetFiles(directoryTextBox.Text, "*.jpg"))
-                {
-                    imageListBox.Items.Add(Path.GetFileName(file));
-                }
-                //Temporary fix
-                File.WriteAllText(presenter.startDirectoryFilePath, directoryTextBox.Text);
-            }
+           presenter.ImagesLocationChanged();
         }
 
         private void imageListBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -70,6 +61,16 @@ namespace PictureViewer
         public string NewImagesLocation
         {
             get { return folderBrowserDialog.SelectedPath; }
+        }
+
+        public void ClearImagesList()
+        {
+            imageListBox.Items.Clear();
+        }
+
+        public void AddImageToList(string imageName)
+        {
+            imageListBox.Items.Add(imageName);
         }
     }
 }
