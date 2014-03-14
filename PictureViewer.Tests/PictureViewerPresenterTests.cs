@@ -12,20 +12,27 @@ namespace PictureViewer.Tests
     {
         private const string NewImagesLocation = @"C:\new images location";
         private FileDependenciesStub fileDependencies;
+        private PictureViewerStub formStub;
+        private PictureViewerPresenter presenter;
+
+        [SetUp]
+        public void SetUp()
+        {
+            fileDependencies = new FileDependenciesStub();
+            formStub = new PictureViewerStub();
+            presenter = new PictureViewerPresenter(formStub, fileDependencies);
+        }
 
         [Test]
         public void SelectedImageChangedShouldSetCurrentImageLocationToFullFilePath()
         {
-            fileDependencies = new FileDependenciesStub
+            fileDependencies.ResultsForGetFilesFromDirectoryEnumerable = new List<string>
             {
-                ResultsForGetFilesFromDirectoryEnumerable = new List<string> { @"C:\file1.jpg", @"C:\file2.jpg" }
+                @"C:\file1.jpg",
+                @"C:\file2.jpg"
             };
-            var formStub = new PictureViewerStub
-            {
-                ImagesLocation = @"C:\any made up directory", 
-                SelectedImage = @"file1.jpg"
-            };
-            var presenter = new PictureViewerPresenter(formStub, fileDependencies);
+            formStub.ImagesLocation = @"C:\any made up directory";
+            formStub.SelectedImage = @"file1.jpg";
 
             presenter.SelectedImageChanged();
 
@@ -35,13 +42,8 @@ namespace PictureViewer.Tests
         [Test]
         public void UpdateImagesLocationShouldSetImagesLocationToNewImagesLocation()
         {
-            fileDependencies = new FileDependenciesStub();
-            var formStub = new PictureViewerStub
-            {
-                ShouldUpdateImagesLocation = true,
-                NewImagesLocation = NewImagesLocation
-            };
-            var presenter = new PictureViewerPresenter(formStub, fileDependencies);
+            formStub.ShouldUpdateImagesLocation = true;
+            formStub.NewImagesLocation = NewImagesLocation;
 
             presenter.UpdateImagesLocation();
 
@@ -51,14 +53,9 @@ namespace PictureViewer.Tests
         [Test]
         public void InitializeShouldSetImagesLocation()
         {
-            fileDependencies = new FileDependenciesStub
-            {
-                ExecutablePath = @"C:\executable path\app.exe",
-                ResultForFileExists = true,
-                ResultsForReadAllFileText = NewImagesLocation
-            };
-            var formStub = new PictureViewerStub();
-            var presenter = new PictureViewerPresenter(formStub, fileDependencies);
+            fileDependencies.ExecutablePath = @"C:\executable path\app.exe";
+            fileDependencies.ResultForFileExists = true;
+            fileDependencies.ResultsForReadAllFileText = NewImagesLocation;
 
             presenter.Initialize();
 
